@@ -1,16 +1,13 @@
 #minesweeper-main {
-  display: flex;
+  display: inline-block;
 }
 
 #game-container {
-  display: inline-block;
   padding: 15px 15px 1px 15px;
-  background-color: #BEBFC0;
+  background-color: #bebfc0;
 }
 
 #help-container {
-  border: 1px solid black;
-  flex: 1;
   margin: 0px 10px;
   padding: 10px;
 }
@@ -51,24 +48,25 @@
   padding: 2px 7px 0px 7px;
   height: 36px;
   min-width: 51px;
+  text-align: right;
+}
+
+table {
+  table-layout: fixed;
 }
 
 .cell {
-  padding: 5px 2px 6px 9px;
   font-family: monospace;
   font-weight: bold;
-  color: #C0C0C0;
-  background-color: #C0C0C0;
-  width: 21px;
-  height: 21px;
+  font-size: 1.5em;
+  color: #c0c0c0;
+  background-color: #c0c0c0;
 }
 
 .revealed {
   border-top: 1px solid #828282;
   border-left: 1px solid #828282;
   text-align: center;
-  padding: 8px 8px 8px 8px;
-  min-width: 10px;
 }
 
 .cell-X {
@@ -77,28 +75,28 @@
 }
 
 .cell-0 {
-  color: #C2C2C2;
-  background-color: #C2C2C2;
+  color: #c2c2c2;
+  background-color: #c2c2c2;
 }
 
 .cell-1 {
-  color: #110CBD; /* blue */
+  color: #110cbd; /* blue */
 }
 
 .cell-2 {
-  color: #155F10; /* green */
+  color: #155f10; /* green */
 }
 
 .cell-3 {
-  color: #BB1419; /* red */
+  color: #bb1419; /* red */
 }
 
 .cell-4 {
-  color: #02126A; /* indigo */
+  color: #02126a; /* indigo */
 }
 
 .cell-5 {
-  color: #740E19; /* brown */
+  color: #740e19; /* brown */
 }
 
 .cell-6 {
@@ -114,11 +112,11 @@
 }
 
 .debug {
-  color: #A0A0A0;
+  color: #a0a0a0;
 }
 
 .debug-link {
-  color: #BEBFC0;
+  color: #bebfc0;
   text-decoration: none;
 }
 
@@ -136,13 +134,10 @@
   user-select: none;
 }
 
-div {
-  min-width: 21px;
-  min-height: 21px;
-}
-
-div.mine {
-  text-align: right;
+.cell-min {
+  padding-top: 6px;
+  min-width: 27px;
+  min-height: 27px;
 }
 
 td:not(.revealed):not(.debug) > div.mine {

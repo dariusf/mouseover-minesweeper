@@ -48,8 +48,6 @@ Minesweeper.prototype.init = function(settings) {
   this.elapsedTime = 0;
   clearInterval(this.timeInterval);
 
-  this.misclickCount = 0;
-
   this.initField(settings.rows, settings.cols);
   this.initDisplay();
 };
@@ -136,24 +134,17 @@ Minesweeper.prototype.countAdjacentMines = function(row, col) {
  * already made, so we can just change this cell's click handler for the
  * duration of the game.
  */
-Minesweeper.prototype.firstClickHandler = function(row, col) {
+Minesweeper.prototype.firstClickHandler = function(row, col, mouseover) {
   if (this.field[row][col].flagged) return;
 
-  if (this.firstClickOccurred) {
-    var that = this;
-    var cell = this.getCell(row, col);
-    cell.unbind('click');
-    cell.click(function(event) {
-      that.mainClickHandler(row, col);
-    });
-  } else {
+  if (!this.firstClickOccurred) {
     this.firstClickOccurred = true;
     this.setMines(this.settings.mines, row, col);
     this.initDisplay();
     this.startTimer();
   }
 
-  this.mainClickHandler(row, col);
+  this.mainClickHandler(row, col, mouseover);
 };
 
 /**
@@ -179,8 +170,11 @@ Minesweeper.prototype.initDisplay = function() {
       td.html(that.createElemForValue(that.field[r][c].val));
 
       // left click
+      td.mouseenter(function(event) {
+        that.firstClickHandler(r, c, true);
+      });
       td.click(function(event) {
-        that.firstClickHandler(r, c);
+        that.firstClickHandler(r, c, false);
       });
       
       // right click
@@ -206,6 +200,10 @@ Minesweeper.prototype.initDisplay = function() {
   this.initHelper();
 };
 
+Minesweeper.prototype.reset = function () {
+  this.init(this.settings);
+};
+
 /**
  * Control panel is the top portion that has the timer, mine count, and reset
  * button. This adds those components to the top of the container.  Must be
@@ -220,6 +218,8 @@ Minesweeper.prototype.initControlPanel = function() {
 
   var controlPanel = this.controlPanel;
   var resetButton = this.controlPanel.resetButton;
+  // resetButton.html('😐');
+  resetButton.html('🤯');
   var flagCount = this.controlPanel.flagCount;
   var timer = this.controlPanel.timer;
 
@@ -241,7 +241,7 @@ Minesweeper.prototype.initControlPanel = function() {
   resetButton.css('margin-left',
       (controlPanel.innerWidth() - resetButton.width()) / 2);
   resetButton.click(function(event) {
-    that.init(that.settings);
+    that.reset();
   });
 
   // counter for mines left
@@ -259,7 +259,6 @@ Minesweeper.prototype.initControlPanel = function() {
 };
 
 Minesweeper.prototype.initHelper = function() {
-  this.misclickDisplay = $('#misclick-counter');
 };
 
 /**
@@ -276,13 +275,13 @@ Minesweeper.prototype.getCell = function(row, col) {
  * exactly as many mines as this cell's value, expand the rest (potentially
  * resulting in a loss).
  */
-Minesweeper.prototype.mainClickHandler = function(row, col) {
+Minesweeper.prototype.mainClickHandler = function(row, col, mouseover) {
   var field = this.field;
 
   // do nothing if already lost or if a flagged cell is clicked
   if (this.gameEnded() || field[row][col].flagged) return;
 
-  if (!this.getCell(row, col).hasClass('revealed')) {
+  if (!this.getCell(row, col).hasClass('revealed') && !mouseover) {
     this.revealCell(row, col);
 
   } else if (this.flagAllNeighborsRequested(row, col)) {
@@ -297,10 +296,6 @@ Minesweeper.prototype.mainClickHandler = function(row, col) {
       this.revealCell(neighbors[i].row, neighbors[i].col);
       if (this.gameEnded()) return;
     }
-
-  } else {
-    this.misclickCount++;
-    this.misclickDisplay.html(this.misclickCount);
   }
 };
 
@@ -453,7 +448,8 @@ Minesweeper.prototype.startTimer = function() {
  */
 Minesweeper.prototype.displayWin = function() {
   this.won = true;
-  this.controlPanel.resetButton.html('\uD83D\uDE0E');
+  // this.controlPanel.resetButton.html('😎');
+  this.controlPanel.resetButton.html('🤪');
   clearInterval(this.timeInterval);
 };
 
@@ -463,7 +459,8 @@ Minesweeper.prototype.displayWin = function() {
 Minesweeper.prototype.displayLoss = function() {
   if (this.lost) return;
   this.lost = true;
-  this.controlPanel.resetButton.html('\uD83D\uDE35'); // dizzy face emoji
+  // this.controlPanel.resetButton.html('😵');
+  this.controlPanel.resetButton.html('🥴');
   clearInterval(this.timeInterval);
   for (var r = 0; r < this.field.length; r++) {
     for (var c = 0; c < this.field[0].length; c++) {
@@ -473,6 +470,7 @@ Minesweeper.prototype.displayLoss = function() {
       }
     }
   }
+  setTimeout(() => this.reset(), 500);
 };
 
 /**
@@ -507,6 +505,7 @@ Minesweeper.prototype.createElemForValue = function(val) {
   if (val == this.MINE) {
     div.addClass('mine');
   }
+  div.addClass('cell-min')
   div.html(val);
   return div.get(0);
 }
